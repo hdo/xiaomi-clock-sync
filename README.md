@@ -46,6 +46,13 @@ Then open <http://localhost:8000>. To use it on a smartphone, publish the projec
 - `js/ble-clock.js` – BLE protocol (connect, read/set time)
 - `js/app.js` – UI logic
 - `css/app.css` – a few custom styles
+- `manifest.webmanifest`, `icons/` – web app manifest and home-screen icons (SVG sources plus rendered PNGs)
+
+## Home screen
+
+In Chrome on Android, open the page and choose **Add to home screen** / **Install app**.
+The app then starts in its own window with the clock icon. If a shortcut was created before the icon existed,
+remove it and add it again.
 
 ## References
 
@@ -54,3 +61,4 @@ Then open <http://localhost:8000>. To use it on a smartphone, publish the projec
 - [Telink BLE OTA Flasher](https://pvvx.github.io/ATC_MiThermometer/TelinkMiFlasher.html) – the web flasher this project is based on ([source](https://github.com/pvvx/pvvx.github.io/tree/master/ATC_MiThermometer))
 - [MJWSD05MMC device page](https://pvvx.github.io/MJWSD05MMC) – pvvx documentation for this device
 - [Device IDs](https://pvvx.github.io/) – overview of the devices supported by pvvx
+- [Lucide](https://lucide.dev/) – the app icon uses the “history” glyph (ISC license)
