@@ -1,0 +1,8 @@
+# Local Claude Code settings (preview config)
+.claude/
+
+# OS / editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

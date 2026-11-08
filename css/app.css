@@ -1,0 +1,31 @@
+.app-container {
+	max-width: 640px;
+}
+
+.min-w-0 {
+	min-width: 0;
+}
+
+.clock-value {
+	font-size: clamp(1.75rem, 8vw, 2.5rem);
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
+	letter-spacing: .02em;
+	line-height: 1.2;
+}
+
+.log {
+	max-height: 260px;
+	overflow: auto;
+	font-size: .75rem;
+	white-space: pre-wrap;
+	word-break: break-word;
+	background: var(--bs-tertiary-bg);
+	border-radius: var(--bs-border-radius);
+	padding: .75rem;
+}
+
+.log:empty::before {
+	content: "No entries";
+	color: var(--bs-secondary-color);
+}
