@@ -4,7 +4,7 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="theme-color" content="#0d6efd">
-	<title>MJWSD05MMC Clock Sync</title>
+	<title>Xiaomi Clock Sync</title>
 	<link rel="manifest" href="manifest.webmanifest">
 	<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
 	<link rel="icon" href="icons/favicon-32.png" sizes="32x32" type="image/png">
@@ -27,7 +27,7 @@
 			<i class="bi bi-clock-history text-primary"></i>
 			<span>Clock Sync</span>
 		</span>
-		<span class="badge bg-body-secondary text-body-secondary border fw-normal d-none d-sm-inline">Xiaomi MJWSD05MMC</span>
+		<span class="badge bg-body-secondary text-body-secondary border fw-normal d-none d-sm-inline">MJWSD05MMC · LYWSD02MMC</span>
 	</div>
 </nav>
 
@@ -119,7 +119,9 @@
 					<label for="optPrefixes" class="form-label">Device name filter</label>
 					<input id="optPrefixes" type="text" class="form-control" autocomplete="off" spellcheck="false">
 					<div class="form-text">
-						Comma-separated name prefixes. Default: <code>BTH_</code> (pvvx, ch), <code>BTE_</code> (pvvx, en), <code>MJWSD05MMC</code> (stock firmware).
+						Comma-separated name prefixes. Defaults:
+						MJWSD05MMC – <code>BTH_</code> (pvvx, ch), <code>BTE_</code> (pvvx, en), <code>MJWSD05MMC</code> (stock);
+						LYWSD02MMC – <code>D02_</code> (pvvx), <code>LYWSD02</code> (stock, also matches the older LYWSD02).
 						Add more if you renamed your devices.
 					</div>
 					<button id="btnResetPrefixes" type="button" class="btn btn-sm btn-outline-secondary mt-2">Restore defaults</button>

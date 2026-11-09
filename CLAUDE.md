@@ -9,7 +9,8 @@
 
 ## Project
 
-Static web app (no build step) that syncs the clock of Xiaomi MJWSD05MMC thermometers via Web Bluetooth.
+Static web app (no build step) that syncs the clock of Xiaomi MJWSD05MMC and LYWSD02MMC (incl. older LYWSD02) thermometers via Web Bluetooth.
+Supported are the pvvx custom firmware and the stock Xiaomi firmware; other models are out of scope unless the user asks.
 Based on pvvx's Telink BLE OTA Flasher; see `README.md` for protocol details and references.
 
 - `index.html` – Bootstrap 5.3 UI (loaded from CDN), mobile-first, kept plain and simple

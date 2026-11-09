@@ -1,7 +1,7 @@
 {
-  "name": "MJWSD05MMC Clock Sync",
+  "name": "Xiaomi Clock Sync",
   "short_name": "Clock Sync",
-  "description": "Sync the clock of Xiaomi MJWSD05MMC thermometers via Web Bluetooth.",
+  "description": "Sync the clock of Xiaomi MJWSD05MMC and LYWSD02MMC thermometers via Web Bluetooth.",
   "lang": "en",
   "start_url": "./",
   "scope": "./",

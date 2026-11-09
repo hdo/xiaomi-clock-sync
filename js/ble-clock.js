@@ -1,16 +1,18 @@
 /*
- * BLE access to the clock of the Xiaomi MJWSD05MMC.
+ * BLE access to the clock of Xiaomi MJWSD05MMC and LYWSD02(MMC) devices.
  *
  * Protocols (taken from the Telink BLE OTA Flasher by pvvx):
  *
- *  pvvx custom firmware (name "BTH_xxxxxx" / "BTE_xxxxxx"):
+ *  pvvx custom firmware (name "BTH_xxxxxx" / "BTE_xxxxxx" = MJWSD05MMC, "D02_xxxxxx" = LYWSD02MMC):
  *    Service 0x1F10, characteristic 0x1F1F (write + notify)
  *    Set time:  [0x23, t0, t1, t2, t3]  t = local time in seconds since 1970 (little endian)
  *    Read time: [0x23] -> notify [0x23, cur(4), lastSet(4)]
  *
- *  Stock Xiaomi firmware (name "MJWSD05MMC"):
- *    Service ebe0ccb0-…, characteristic ebe0ccb7-… (read/write, 6 bytes)
- *    [utc(4, LE), time zone in hours, 0]
+ *  Stock Xiaomi firmware (name "MJWSD05MMC", "LYWSD02MMC", "LYWSD02"):
+ *    Service ebe0ccb0-…, characteristic ebe0ccb7-… (read/write)
+ *    6 bytes: [utc(4, LE), time zone in hours (negative + 24), 0]   (MJWSD05MMC, LYWSD02MMC)
+ *    5 bytes: [utc(4, LE), time zone in hours (int8)]               (older LYWSD02, see bluetooth-clocks)
+ *    The payload length is taken from a read of the characteristic.
  *    Note: newer stock firmware may require a Mi login;
  *    writing then fails.
  */
@@ -28,7 +30,7 @@
 	};
 
 	const CMD_TIME = 0x23;
-	const DEFAULT_PREFIXES = ['BTH_', 'BTE_', 'MJWSD05MMC'];
+	const DEFAULT_PREFIXES = ['BTH_', 'BTE_', 'MJWSD05MMC', 'D02_', 'LYWSD02'];
 	const LOCALE = 'en-GB';
 
 	/** Local "wall clock" time in seconds (what the display should show). */
@@ -48,6 +50,7 @@
 			this.server = null;
 			this.mode = null;          // 'custom' | 'mi'
 			this.char = null;
+			this.miLength = 0;         // stock firmware payload length (5 or 6), 0 = not read yet
 			this.info = {};
 			this._waiter = null;
 			this._onNotify = this._onNotify.bind(this);
@@ -143,11 +146,14 @@
 				deviceSeconds = v.getUint32(1, true);
 				if (v.byteLength >= 9) lastSet = v.getUint32(5, true);
 			} else {
-				const v = await this.char.readValue();
-				this.log('MiClock read: ' + toHex(v));
-				if (v.byteLength < 5) throw new Error('Unexpected response from device');
-				let tz = v.getUint8(4);
-				if (tz > 12) tz -= 24;
+				const v = await this._readMiClock();
+				let tz;
+				if (v.byteLength === 5) {
+					tz = v.getInt8(4);
+				} else {
+					tz = v.getUint8(4);
+					if (tz > 12) tz -= 24;
+				}
 				deviceSeconds = v.getUint32(0, true) + tz * 3600;
 			}
 			const hostSeconds = hostLocalSeconds();
@@ -159,6 +165,8 @@
 		/** Sets the device clock to the current time of this computer/phone. */
 		async syncTime() {
 			this._assertConnected();
+			// Stock firmware: the payload length (5 or 6 bytes) depends on the model
+			if (this.mode === 'mi' && !this.miLength) await this._readMiClock();
 			// Wait for the start of the next second -> error < 1 s instead of up to 1 s
 			await sleep(1000 - (Date.now() % 1000));
 			const now = Date.now();
@@ -168,12 +176,18 @@
 				buf = new Uint8Array([CMD_TIME, t & 0xff, (t >>> 8) & 0xff, (t >>> 16) & 0xff, (t >>> 24) & 0xff]);
 			} else {
 				const ut = Math.floor(now / 1000);
-				let tzh = Math.round(-new Date(now).getTimezoneOffset() / 60);
-				if (tzh < 0) tzh += 24;
-				buf = new Uint8Array([ut & 0xff, (ut >>> 8) & 0xff, (ut >>> 16) & 0xff, (ut >>> 24) & 0xff, tzh, 0]);
+				const tzh = Math.round(-new Date(now).getTimezoneOffset() / 60);
+				const utBytes = [ut & 0xff, (ut >>> 8) & 0xff, (ut >>> 16) & 0xff, (ut >>> 24) & 0xff];
+				buf = this.miLength === 5
+					? new Uint8Array([...utBytes, tzh & 0xff])
+					: new Uint8Array([...utBytes, tzh < 0 ? tzh + 24 : tzh, 0]);
 			}
 			this.log('Sending time: ' + toHex(buf));
-			await this.char.writeValue(buf);
+			const p = this.char.properties;
+			if (this.mode === 'mi' && this.miLength === 5 && p.writeWithoutResponse && this.char.writeValueWithoutResponse)
+				await this.char.writeValueWithoutResponse(buf);
+			else
+				await this.char.writeValue(buf);
 			this.log('Time set: ' + new Date(now).toLocaleString(LOCALE));
 		}
 
@@ -181,6 +195,14 @@
 
 		_assertConnected() {
 			if (!this.connected) throw new Error('Not connected');
+		}
+
+		async _readMiClock() {
+			const v = await this.char.readValue();
+			this.log('MiClock read: ' + toHex(v));
+			if (v.byteLength < 5) throw new Error('Unexpected response from device');
+			this.miLength = v.byteLength === 5 ? 5 : 6;
+			return v;
 		}
 
 		async _command(data, expectId, timeout = 4000) {
@@ -213,6 +235,7 @@
 			this.char = null;
 			this.server = null;
 			this.mode = null;
+			this.miLength = 0;
 			this._waiter = null;
 			if (was || this.device) this.log('Disconnected');
 			this.dispatchEvent(new Event('disconnected'));

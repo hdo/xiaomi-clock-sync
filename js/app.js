@@ -221,7 +221,13 @@
 	function init() {
 		if (!ClockDevice.supported) $('noBluetooth').classList.remove('d-none');
 
-		$('optPrefixes').value = store.get(STORE.prefixes, ClockDevice.defaultPrefixes).join(', ');
+		// A filter saved before LYWSD02 support still equals the old defaults -> upgrade it
+		let saved = store.get(STORE.prefixes, ClockDevice.defaultPrefixes);
+		if (saved.join(',') === 'BTH_,BTE_,MJWSD05MMC') {
+			saved = ClockDevice.defaultPrefixes;
+			store.set(STORE.prefixes, saved);
+		}
+		$('optPrefixes').value = saved.join(', ');
 
 		$('optPrefixes').addEventListener('change', () => store.set(STORE.prefixes, prefixes()));
 		$('btnResetPrefixes').addEventListener('click', () => {
