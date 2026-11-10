@@ -29,7 +29,7 @@ by pvvx, the [ATC_MiThermometer](https://github.com/pvvx/ATC_MiThermometer) firm
 |---|---|---|---|---|
 | MJWSD05MMC (Chinese display) | pvvx custom | `BTH_xxxxxx` | Custom command `0x23` | Tested¹ |
 | MJWSD05MMC (English display) | pvvx custom | `BTE_xxxxxx` | Custom command `0x23` | Tested¹ |
-| MJWSD05MMC | Stock | `MJWSD05MMC` | MiClock, 6 bytes | Untested |
+| MJWSD05MMC | Stock | `MJWSD05MMC` | MiClock, 6 bytes | Tested |
 | LYWSD02MMC | pvvx custom (v5.8+) | `D02_xxxxxx` | Custom command `0x23` | Untested |
 | LYWSD02MMC | Stock | `LYWSD02MMC` | MiClock, 6 bytes | Tested |
 | LYWSD02 (older model) | Stock | `LYWSD02` | MiClock, 5 bytes | Untested |
