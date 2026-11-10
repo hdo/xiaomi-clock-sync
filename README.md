@@ -4,6 +4,8 @@ A lightweight web app to sync the clock of **Xiaomi MJWSD05MMC** and **LYWSD02MM
 Derived from the [Telink BLE OTA Flasher](https://pvvx.github.io/ATC_MiThermometer/TelinkMiFlasher.html) by
 [pvvx](https://github.com/pvvx), reduced to the clock function, built with Bootstrap 5 and optimized for smartphones.
 
+**▶ Open the app: <https://hdo.github.io/xiaomi-clock-sync/>** – no installation needed, just Chrome or Edge with Bluetooth.
+
 ## Features
 
 - Device search limited to the supported models (name filter `BTH_`, `BTE_`, `MJWSD05MMC`, `D02_`, `LYWSD02`, adjustable under “Advanced”)
@@ -38,13 +40,15 @@ See [technical.md](technical.md) for a detailed description of the protocol.
 Web Bluetooth requires a secure context (`https://` or `localhost`) and Chrome/Edge (desktop or Android).
 On iOS it only works with the “Bluefy” app.
 
+Online: the app is hosted on GitHub Pages at <https://hdo.github.io/xiaomi-clock-sync/>.
+
 Locally:
 
 ```bash
 python -m http.server 8000
 ```
 
-Then open <http://localhost:8000>. To use it on a smartphone, publish the project, e.g. via GitHub Pages.
+Then open <http://localhost:8000>.
 
 ## Files
 
