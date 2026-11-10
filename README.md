@@ -9,7 +9,7 @@ Derived from the [Telink BLE OTA Flasher](https://pvvx.github.io/ATC_MiThermomet
 - Device search limited to the supported models (name filter `BTH_`, `BTE_`, `MJWSD05MMC`, `D02_`, `LYWSD02`, adjustable under “Advanced”)
 - Read the device time and show the offset from the computer/phone time
 - Set the time with one click (aligned to the full second)
-- List of recently synced devices (stored locally in the browser)
+- List of recently synced devices (stored locally in the browser), with the Web Bluetooth device ID to tell apart devices that share a name
 - Light/dark theme following the system setting
 
 ## Usage

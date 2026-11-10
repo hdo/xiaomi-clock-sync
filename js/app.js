@@ -70,6 +70,9 @@
 			badge.textContent = 'Disconnected';
 		}
 
+		$('devId').textContent = dev.id ? 'ID ' + dev.idHex : '';
+		$('devId').classList.toggle('d-none', !(dev.device && dev.id));
+
 		if (c) {
 			$('devName').textContent = dev.name;
 			const parts = [MODE_LABEL[dev.mode]];
@@ -159,8 +162,10 @@
 	// ---------- History ----------
 
 	function addHistory(delta) {
-		const list = store.get(STORE.history, []).filter(h => h.name !== dev.name);
-		list.unshift({ name: dev.name, mode: dev.mode, time: Date.now(), delta });
+		// Devices are told apart by their Web Bluetooth ID, since several devices can share a name.
+		// Older entries without an ID are matched by name.
+		const list = store.get(STORE.history, []).filter(h => h.id ? h.id !== dev.id : h.name !== dev.name);
+		list.unshift({ name: dev.name, id: dev.id, mode: dev.mode, time: Date.now(), delta });
 		store.set(STORE.history, list.slice(0, 15));
 		renderHistory();
 	}
@@ -184,11 +189,19 @@
 			const name = document.createElement('div');
 			name.className = 'fw-semibold text-truncate';
 			name.textContent = h.name;
+			left.append(name);
+			if (h.id) {
+				const id = document.createElement('div');
+				id.className = 'small text-body-secondary font-monospace text-truncate';
+				id.title = 'Web Bluetooth device ID (not the MAC address)';
+				id.textContent = 'ID ' + ClockUtil.idToHex(h.id);
+				left.append(id);
+			}
 			const sub = document.createElement('div');
 			sub.className = 'small text-body-secondary';
 			sub.textContent = new Date(h.time).toLocaleString(LOCALE, { dateStyle: 'short', timeStyle: 'short' })
 				+ (h.mode ? ' · ' + MODE_LABEL[h.mode] : '');
-			left.append(name, sub);
+			left.append(sub);
 			const ok = document.createElement('i');
 			ok.className = 'bi bi-check-circle-fill text-success flex-shrink-0';
 			li.append(left, ok);

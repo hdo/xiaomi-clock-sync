@@ -42,6 +42,31 @@ by the user; the name filter in the app (“Advanced”) can then be extended.
 The device chooser only lists devices whose name starts with one of the configured prefixes. The defaults are
 `BTH_`, `BTE_`, `MJWSD05MMC`, `D02_` and `LYWSD02`.
 
+### Device identification
+
+With stock firmware, all devices of a model advertise the same name (for example `LYWSD02MMC`). To tell them
+apart, the app shows the **Web Bluetooth device ID** (`BluetoothDevice.id`) in the device card and in the
+“Recently synced” list, and uses it as the key for the history entries.
+
+This ID is **not the MAC address**. Web Bluetooth does not expose MAC addresses; the browser generates an opaque
+ID instead. Chrome returns 16 random bytes encoded as base64. For readability the app shows them as an
+uppercase hex string; the original base64 value is used internally as the history key:
+
+```
+BluetoothDevice.id   irtR2tluYpBik5YWEfntvg==
+Displayed            ID 8ABB51DAD96E62906293961611F9EDBE
+```
+
+The ID is:
+
+- stable for the same device in the same browser profile on the same site, as long as the site keeps the
+  Bluetooth permission,
+- different on every browser, computer and phone, so it cannot be compared across devices,
+- possibly new after the site's Bluetooth permission was revoked or the browser data was cleared.
+
+With pvvx firmware the name already contains the last three bytes of the MAC address (`BTH_xxxxxx`,
+`D02_xxxxxx`), which is unique and the same everywhere.
+
 ---
 
 ## 2. Time representations
@@ -298,7 +323,8 @@ firmware 2.1.1_0159 and MJWSD06MMC firmware 2.1.1_0009. If the clock write is re
 5. **Write** it to the characteristic.
 
 After a successful write, the UI waits 300 ms and reads the time again (`readTime()`) to show the remaining
-offset, then adds the device to the “Recently synced” list (stored in `localStorage`).
+offset, then adds the device to the “Recently synced” list (stored in `localStorage`, keyed by the device ID,
+see [Device identification](#device-identification)).
 
 `ClockDevice.readTime()`:
 

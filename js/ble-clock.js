@@ -73,6 +73,20 @@
 			return this.device ? (this.device.name || 'Unknown') : '';
 		}
 
+		/**
+		 * Web Bluetooth device ID. This is NOT the MAC address: the browser generates an opaque ID
+		 * per site and browser profile. It stays the same for a device in this browser, so it can
+		 * tell apart devices with the same name, but it differs between browsers/computers/phones.
+		 */
+		get id() {
+			return this.device ? (this.device.id || '') : '';
+		}
+
+		/** The device ID for display: Chrome's base64 ID as an uppercase hex string. */
+		get idHex() {
+			return idToHex(this.id);
+		}
+
 		/** Open the browser's device chooser and connect. */
 		async request(prefixes) {
 			const list = (prefixes && prefixes.length ? prefixes : DEFAULT_PREFIXES);
@@ -89,7 +103,7 @@
 			device.removeEventListener('gattserverdisconnected', this._onDisconnect);
 			device.addEventListener('gattserverdisconnected', this._onDisconnect);
 
-			this.log(`Connecting to ${this.name} …`);
+			this.log(`Connecting to ${this.name} (ID ${this.idHex}) …`);
 			this.server = await this._retry(() => device.gatt.connect(), 3);
 			this.log('GATT server connected');
 
@@ -268,6 +282,20 @@
 		}
 	}
 
+	/**
+	 * Converts a Web Bluetooth device ID to uppercase hex for display.
+	 * Chrome returns 16 random bytes as base64 (e.g. "irtR2tluYpBik5YWEfntvg==" -> "8ABB51DA…EDBE").
+	 * IDs that are not valid base64 are returned unchanged.
+	 */
+	function idToHex(id) {
+		if (!id) return '';
+		try {
+			return Array.from(atob(id), c => c.charCodeAt(0).toString(16).padStart(2, '0')).join('').toUpperCase();
+		} catch (e) {
+			return id;
+		}
+	}
+
 	function sleep(ms) {
 		return new Promise(r => setTimeout(r, ms));
 	}
@@ -278,5 +306,5 @@
 	}
 
 	global.ClockDevice = ClockDevice;
-	global.ClockUtil = { hostLocalSeconds, fmtUtc, sleep };
+	global.ClockUtil = { hostLocalSeconds, fmtUtc, sleep, idToHex };
 })(window);
